@@ -876,7 +876,7 @@ export default {
         }
 
         .mobile-store {
-            width: 95%;
+            width: 100%;
             min-height: 100px;
             @media (min-width: 1024px) {
                 display: none;
@@ -948,10 +948,11 @@ export default {
                 font-family: $ww-font;
                 display: flex;
                 box-sizing: content-box;
+                justify-content: space-evenly;
                 // justify-content: flex-start;
                 // align-content: flex-start;
                 .section {
-                    flex-basis: 100%;
+                    flex-basis: 45%;
 
                     margin-bottom: 25px;
                     cursor: pointer;
