@@ -83,10 +83,9 @@
                         <i class="wwi wwi-chevron-down"></i>
                     </div>
                 </div>
-                <!-- <wwMobileStore :themes="filteredThemes"></wwMobileStore> -->
 
                 <div class="mobile-sections-wrapper">
-                    <div class="section" v-for="(section, index) in storeSectionTypes" :key="index">
+                    <div class="section" v-for="(section, index) in storeSectionTypes" :key="index" @click="selectSection(section)">
                         <div class="section-wrapper" :style="{'background-image': 'url('+ getPreviewUrl(section)+')'}">
                             <div class="section-preview">
                                 <div class="preview-name">{{ section.name }}</div>
@@ -322,8 +321,6 @@ export default {
         async getMyAssetsThemes() {
             try {
                 const _url = 'theme/get_public_store_theme'
-
-                // http://localhost:3000/v1/theme/section_categories
 
                 const _usersThemes = await this.apiRequest(_url, 'GET')
 
