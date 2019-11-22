@@ -186,22 +186,38 @@ export default {
             try {
                 let url = 'https://i.twic.pics/v1/resize=800/'
                 if (!section.previews.length) {
-                    // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
-                    url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
+                    url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
                 } else {
                     if (section.previews[0].includes("http"))
                         url += section.previews[0];
                     else
-                        // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
-                        url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
+                        url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
                 }
                 return url;
             } catch (error) {
                 console.error(error)
             }
         },
+        // getPreviewUrl(section) {
+        //     try {
+        //         let url = 'https://i.twic.pics/v1/resize=800/'
+        //         if (!section.previews.length) {
+        //             // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
+        //             url += "https://cdn.weweb.app/public/images/no_image_selected.png"
+
+        //         } else {
+        //             if (section.previews[0].includes("http"))
+        //                 url += section.previews[0];
+        //             else
+        //                 // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
+        //                 url += "https://cdn.weweb.app/public/images/no_image_selected.png"
+
+        //         }
+        //         return url;
+        //     } catch (error) {
+        //         console.error(error)
+        //     }
+        // },
         getStoreDisplayName(store) {
             try {
                 if (this.storeNames[store.name]) {

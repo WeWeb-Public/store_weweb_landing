@@ -253,8 +253,8 @@ export default {
             this.dbCategories = await this.getSectionsCategories()
 
             await this.getAssetsThemes()
-
-            this.selectedTheme = this.filteredThemes[0]
+            if (this.filteredThemes && this.filteredThemes.length > 0)
+                this.selectedTheme = this.filteredThemes[0]
 
             this.loading = false;
         },
@@ -394,21 +394,19 @@ export default {
                 } catch (error) {
                     console.error(error)
                 }
+
         },
 
         getThemePreviewUrl(imageUrl, size) {
             try {
                 let url = `https://i.twic.pics/v1/resize=${size}/`
                 if (!imageUrl) {
-                    // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
-                    url += "https://cdn.weweb.app/public/images/no_image_selected.png"
+                    url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
                 } else {
                     if (imageUrl.includes("http"))
                         url += imageUrl
                     else
-                        // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + imageUrl
-                        url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
+                        url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + imageUrl
                 }
                 return url;
             } catch (error) {
@@ -420,23 +418,18 @@ export default {
             try {
                 let url = 'https://i.twic.pics/v1/resize=800/'
                 if (!section.previews.length) {
-                    // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
-                    url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
+                    url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
                 } else {
                     if (section.previews[0].includes("http"))
                         url += section.previews[0];
                     else
-                        // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
-                        url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
+                        url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
                 }
                 return url;
             } catch (error) {
                 console.error(error)
             }
         },
-
 
         formatTags(tags) {
             try {

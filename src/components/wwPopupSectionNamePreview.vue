@@ -272,13 +272,13 @@ export default {
         margin-top: 30px;
         .close-btn {
             box-sizing: border-box;
-            padding: 5px 10px;
+            padding: 5px 20px;
             border-radius: 20px;
             text-transform: uppercase;
             color: white;
             font-size: 13px;
             font-weight: bold;
-            font-family: "Montserrat", sans-serif;
+            font-family: $ww-font;
             cursor: pointer;
             right: 30px;
             border: 0px;
