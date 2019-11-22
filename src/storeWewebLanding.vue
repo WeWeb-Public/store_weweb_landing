@@ -18,15 +18,16 @@
 
         <div class="ww-popup-store">
             <wwObject class="background" :ww-object="section.data.background" ww-category="background" :class="{'section-background': editMode}"></wwObject>
-            <div :class="{'popup-container-loader': isLoading, 'loading': isLoading}">
-                <div class="loader">
-                    <div class="spinner">
-                        <div class="arc arc-1"></div>
-                        <div class="arc arc-2"></div>
+
+            <div class="store-wrapper">
+                <div :class="{'popup-container-loader': isLoading, 'loading': isLoading}">
+                    <div class="loader">
+                        <div class="spinner">
+                            <div class="arc arc-1"></div>
+                            <div class="arc arc-2"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="store-wrapper">
                 <div class="content">
                     <!-- theme container -->
                     <div class="themes-container">
@@ -45,8 +46,7 @@
                         -->
 
                         <div class="themes ww-scroll-bar">
-                            <!-- <div class="theme" v-for="theme in filteredThemes" :key="theme.id" v-show="theme.sectionsCount > 0" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}"> -->
-                            <div class="theme" v-for="theme in filteredThemes" :key="theme.id" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}">
+                            <div class="theme" v-for="theme in filteredThemes" :key="theme.id" v-show="theme.sectionsCount > 0" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}">
                                 <div class="theme-name">
                                     {{ theme.themeName }}
                                     <span class="section-count">
@@ -67,7 +67,7 @@
 
                 <!-- theme sections -->
                 <div class="sections-wrapper">
-                    <wwStoreSections :sections="storeSectionTypes" :categories="categories"></wwStoreSections>
+                    <wwStoreSections :sections="storeSectionTypes" :categories="categories" @selectSection="selectSection"></wwStoreSections>
                 </div>
             </div>
 
@@ -101,6 +101,8 @@
             </div>
         </div>
 
+        <wwPopupSectionNamePreview v-if="showSectionName" :section="selectedSection" @close="showSectionName = false"></wwPopupSectionNamePreview>
+
         <!--BOTTOM WWOBJS-->
         <div class="bottom-ww-objs">
             <wwLayoutColumn tag="div" ww-default="ww-image" :ww-list="section.data.bottomWwObjs" class="top-ww-obj" @ww-add="add(section.data.bottomWwObjs, $event)" @ww-remove="remove(section.data.bottomWwObjs, $event)">
@@ -116,6 +118,7 @@
 import axios from 'axios'
 import wwStoreSections from './components/wwStoreSections.vue'
 import wwManagerSearchBarIcon from './components/wwManagerSearchBarIcon.vue'
+import wwPopupSectionNamePreview from './components/wwPopupSectionNamePreview.vue'
 // import wwMobileStore from './components/wwMobileStore.vue'
 
 export default {
@@ -123,7 +126,8 @@ export default {
     components: {
         wwStoreSections,
         // wwMobileStore,
-        wwManagerSearchBarIcon
+        wwManagerSearchBarIcon,
+        wwPopupSectionNamePreview
     },
     props: {
         // The section controller object is passed to you.
@@ -133,12 +137,13 @@ export default {
         return {
             dbCategories: null,
             filters: [],
-
+            selectedSection: {},
             filterId: null,
             fixedCategories: null,
             storeSectionTypes: null,
             selectedTheme: undefined,
             loading: false,
+            showSectionName: false,
             filterOptions: {
                 type: 'text',
                 values: [
@@ -375,6 +380,11 @@ export default {
 
         },
 
+        async selectSection(section) {
+            this.showSectionName = true
+            this.selectedSection = section
+
+        },
 
         async selectTheme(theme) {
             if (theme)
@@ -450,7 +460,6 @@ export default {
 
         /* Get api url */
         getApiUrl(url) {
-            // return 'localhost:3000/v1/' + url
             if (wwLib.envMode == 'development') {
                 return 'http://localhost:3000/v1/' + url
                 // return 'http://weweb-api:3000/v1/' + url
@@ -516,16 +525,28 @@ export default {
 
 .store_weweb_landing {
     margin-bottom: 20px;
+
+    .ww-scroll-bar {
+        &::-webkit-scrollbar-thumb {
+            background-color: #808080;
+        }
+        &::-webkit-scrollbar-track {
+            background-color: #ffffff00;
+        }
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: #ffffff00;
+        }
+    }
     .popup-container-loader {
-        position: relative;
+        position: absolute;
         overflow: hidden;
-        top: 0;
+        top: 75px;
         left: 0;
         bottom: 0;
         right: 0;
         z-index: 1;
-        padding: 6px 0 0 0;
-
         &.loading {
             background-color: rgba(255, 255, 255, 0.9);
             .loader {
@@ -635,7 +656,19 @@ export default {
         }
 
         .store-wrapper {
-            height: 600px;
+            width: 100%;
+            // height: 800px;
+            display: none;
+            // overflow: hidden;
+            padding-top: 20px;
+            margin-bottom: 50px;
+            pointer-events: all;
+
+            margin-bottom: 50px;
+
+            @media (min-width: 1024px) {
+                display: flex;
+            }
             .search {
                 display: flex;
                 justify-content: center;
@@ -643,21 +676,14 @@ export default {
                     width: 100%;
                 }
             }
-            // background-color: $background-grey-light;
-            @media (min-width: 1024px) {
-                display: flex;
-            }
-            display: none;
-            overflow: hidden;
-            padding-top: 20px;
-            height: 100%;
-            pointer-events: all;
-
             .content {
                 display: flex;
                 width: 330px;
                 height: 100%;
                 float: left;
+                position: sticky;
+                top: 0;
+                padding-top: 50px;
 
                 .themes-container {
                     padding: 0 20px 0 45px;
