@@ -1,5 +1,6 @@
 <template>
     <div class="ww-popup-section-name">
+        <div class="section-header">- {{ section.name }} -</div>
         <div class="section-wrapper">
             <div class="preview-wrapper">
                 <div class="image-previews ww-scroll-bar">
@@ -119,6 +120,22 @@ export default {
     z-index: 100;
     pointer-events: all;
 
+    .section-header {
+        box-sizing: border-box;
+        width: 100%;
+        position: relative;
+        flex-basis: 100px;
+        display: flex;
+
+        justify-content: center;
+        background-color: white;
+        color: #e02a4d;
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.6rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding: 50px 10px 0 10px;
+    }
     .section-wrapper {
         display: flex;
         flex-direction: column;
@@ -154,7 +171,7 @@ export default {
                         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
                         border: 2px solid white;
                         width: 100%;
-                        padding-bottom: (9/16) * 100%;
+                        padding-bottom: 56.25%;
                         background-size: contain;
                         background-position: center;
                         background-repeat: no-repeat;
@@ -165,16 +182,17 @@ export default {
                 }
                 .mobile-preview-container {
                     float: left;
-                    width: 100% - 75.96439169%;
+                    width: 24.03561%;
                     height: 100%;
                     .mobile-preview {
                         background-size: contain;
-                        background-position: center;
+                        background-position: 50%;
                         background-repeat: no-repeat;
-                        border: 1px solid white;
+                        border: 1px solid #fff;
                         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
                         width: 100%;
                         height: 100%;
+                        padding-bottom: 176.25%;
                         &:hover {
                             box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.17);
                         }
