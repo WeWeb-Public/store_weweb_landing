@@ -8,8 +8,7 @@
         <!-- wwManager:start -->
         <wwSectionEditMenu :sectionCtrl="sectionCtrl"></wwSectionEditMenu>
         <!-- wwManager:end -->
-        <!-- Weweb Wallpaper -->
-        <wwObject class="background" :ww-object="section.data.background" ww-category="background"></wwObject>
+
         <!--TOP WWOBJS-->
         <div class="top-ww-objs">
             <wwLayoutColumn tag="div" ww-default="ww-image" :ww-list="section.data.topWwObjs" class="top-ww-obj" @ww-add="add(section.data.topWwObjs, $event)" @ww-remove="remove(section.data.topWwObjs, $event)">
@@ -18,32 +17,36 @@
         </div>
 
         <div class="ww-popup-store">
-            <!-- <div :class="{'popup-container-loader': isLoading, 'loading': isLoading}">
+            <wwObject class="background" :ww-object="section.data.background" ww-category="background" :class="{'section-background': editMode}"></wwObject>
+            <div :class="{'popup-container-loader': isLoading, 'loading': isLoading}">
                 <div class="loader">
                     <div class="spinner">
                         <div class="arc arc-1"></div>
                         <div class="arc arc-2"></div>
                     </div>
                 </div>
-            </div>-->
+            </div>
             <div class="store-wrapper">
                 <div class="content">
                     <!-- theme container -->
                     <div class="themes-container">
                         <div class="tabs">
-                            <div class="tab active">themes</div>
+                            <div class="tab active" @click="toggleItem()">themes</div>
                         </div>
-                        <!-- <div class="theme-header">
-                        <div class="theme-filter-wrapper">
-                            <wwManagerSelect class="select select-theme-fix" :options="filterOptions" :value="filterId" @change="setThemeFromId($event)"></wwManagerSelect>
-                            <div class="search search-theme-fix">
-                                <wwManagerSearchBarIcon class="search-bar" placeholder="Portfolio, slider, tools, ..." v-model="search"></wwManagerSearchBarIcon>
+                        <!-- 
+                        <div class="theme-header">
+                            <div class="theme-filter-wrapper">
+                                <wwManagerSelect class="select select-theme-fix" :options="filterOptions" :value="filterId" @change="setThemeFromId($event)"></wwManagerSelect>
+                                <div class="search search-theme-fix">
+                                    <wwManagerSearchBarIcon class="search-bar" placeholder="Portfolio, slider, tools, ..." v-model="search"></wwManagerSearchBarIcon>
+                                </div>
                             </div>
                         </div>
-                        </div>-->
+                        -->
 
                         <div class="themes ww-scroll-bar">
-                            <div class="theme" v-for="theme in filteredThemes" :key="theme.id" v-show="theme.sectionsCount > 0" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}">
+                            <!-- <div class="theme" v-for="theme in filteredThemes" :key="theme.id" v-show="theme.sectionsCount > 0" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}"> -->
+                            <div class="theme" v-for="theme in filteredThemes" :key="theme.id" @click="selectTheme(theme)" :class="{'active': selectedTheme == theme}">
                                 <div class="theme-name">
                                     {{ theme.themeName }}
                                     <span class="section-count">
@@ -71,19 +74,19 @@
             <div class="mobile-store">
                 <div class="dropdown-mobile">
                     <div class="select">
-                        <select name="menus-select" v-model="selectedTheme" @change="selectTheme(selectedTheme)">
-                            <option v-for="theme in filters" :key="theme.id" :value="theme.id">
+                        <select name="menus-select" v-model="selectedTheme" @change="selectTheme(selected)">
+                            <option v-for="theme in filteredThemes" :key="theme.id" :value="theme.themeName" v-show="theme.sectionsCount > 0">
                                 <div>{{ theme.themeName }}</div>
                             </option>
                         </select>
-                        <div class="text"></div>
+                        <div class="text" v-if="selectedTheme && selectedTheme.themeName">{{ selectedTheme.themeName }}</div>
                         <i class="wwi wwi-chevron-down"></i>
                     </div>
                 </div>
                 <!-- <wwMobileStore :themes="filteredThemes"></wwMobileStore> -->
 
-                <!-- <div class="sections-wrapper">
-                    <div class="section" v-for="(section, index) in filteredThemes" :key="index" @click="selectSection(section)">
+                <div class="mobile-sections-wrapper">
+                    <div class="section" v-for="(section, index) in storeSectionTypes" :key="index">
                         <div class="section-wrapper" :style="{'background-image': 'url('+ getPreviewUrl(section)+')'}">
                             <div class="section-preview">
                                 <div class="preview-name">{{ section.name }}</div>
@@ -94,7 +97,7 @@
                             </div>
                         </div>
                     </div>
-                </div>-->
+                </div>
             </div>
         </div>
 
@@ -134,7 +137,7 @@ export default {
             filterId: null,
             fixedCategories: null,
             storeSectionTypes: null,
-            selectedTheme: '',
+            selectedTheme: undefined,
             loading: false,
             filterOptions: {
                 type: 'text',
@@ -166,6 +169,15 @@ export default {
                 '--activeHeight': `${this.activeHeight + 28}px`
             }
         },
+
+        selected() {
+            for (const theme of this.filters) {
+                if (this.selectedTheme === theme.themeName)
+                    return theme
+            }
+            return undefined
+        },
+
         categories() {
             return this.fixedCategories
         },
@@ -218,7 +230,7 @@ export default {
                 this.sectionCtrl.update(this.section);
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     },
     mounted() {
@@ -237,10 +249,8 @@ export default {
             this.dbCategories = await this.getSectionsCategories()
 
             await this.getAssetsThemes()
-            if (!this.filteredThemes) {
-                await this.getAssetsThemes()
-            }
 
+            this.selectedTheme = this.filteredThemes[0]
 
             this.loading = false;
         },
@@ -248,6 +258,20 @@ export default {
             return wwLib.wwLang.getText(text)
         },
 
+
+        async toggleItem() {
+            try {
+                this.filterId = null
+                this.search = ''
+                this.loading = true
+
+                await this.getAssetsThemes()
+
+                this.loading = false
+            } catch (error) {
+                console.error(error)
+            }
+        },
         /* get the categories and add an all value to them */
         async getSectionsCategories() {
             try {
@@ -279,6 +303,7 @@ export default {
                 this.filters = await this.getMyAssetsThemes()
 
                 if (this.filteredThemes && this.filteredThemes.length > 0) {
+
                     await this.selectTheme(this.filteredThemes[0])
                     await this.formatThemeForFilter(this.filters)
                 } else {
@@ -352,7 +377,6 @@ export default {
 
 
         async selectTheme(theme) {
-            console.log('theme:', theme)
             if (theme)
                 try {
                     this.loading = true
@@ -380,6 +404,44 @@ export default {
 
                 }
                 return url;
+            } catch (error) {
+                console.error(error)
+            }
+        },
+
+        getPreviewUrl(section) {
+            try {
+                let url = 'https://i.twic.pics/v1/resize=800/'
+                if (!section.previews.length) {
+                    // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
+                    url += "https://cdn.weweb.app/public/images/no_image_selected.png"
+
+                } else {
+                    if (section.previews[0].includes("http"))
+                        url += section.previews[0];
+                    else
+                        // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
+                        url += "https://cdn.weweb.app/public/images/no_image_selected.png"
+
+                }
+                return url;
+            } catch (error) {
+                console.error(error)
+            }
+        },
+
+
+        formatTags(tags) {
+            try {
+                let _tagsArray = []
+                const tagsArray = []
+                if (tags) {
+                    _tagsArray = tags.split(',')
+                    for (const tag of _tagsArray) {
+                        tagsArray.push(tag.trim())
+                    }
+                }
+                return tagsArray
             } catch (error) {
                 console.error(error)
             }
@@ -452,233 +514,12 @@ export default {
 <style scoped lang="scss">
 @import "./assets/manager-css/main";
 
-.ww-popup-store {
-    display: flex;
-    flex-direction: column;
-}
-
-.search {
-    display: flex;
-    justify-content: center;
-    .search-bar {
-        width: 100%;
-    }
-}
-
-.tabs {
-    display: flex;
-    justify-content: center;
+.store_weweb_landing {
     margin-bottom: 20px;
-    .tab {
-        padding: 0px 20px 10px 20px;
-        font-size: 10px;
-        line-height: 13px;
-        text-align: center;
-        text-transform: uppercase;
-        font-family: $ww-font;
-        font-weight: bold;
-        cursor: pointer;
-        color: $ww-grey-light;
-        position: relative;
-        border-bottom: 1px solid $ww-grey-super-light;
-
-        &::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            height: 10px;
-            width: 10px;
-            background-color: $ww-red-strong;
-            border-radius: 100%;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        &:hover {
-            color: $ww-red;
-        }
-
-        &.active {
-            color: $ww-red;
-            &::after {
-                opacity: 1;
-            }
-        }
-    }
-    .tab-fix {
-        text-transform: capitalize;
-        font-size: 1rem;
-        line-height: 15px;
-    }
-}
-
-.store-wrapper {
-    background-color: $background-grey-light;
-    @media (min-width: 1024px) {
-        display: block;
-    }
-    display: none;
-
-    overflow: hidden;
-    padding-top: 20px;
-    height: 100%;
-    pointer-events: all;
-
-    .content {
-        display: flex;
-        width: 330px;
-        height: 100%;
-        float: left;
-
-        .themes-container {
-            padding: 0 20px 0 45px;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            .tabs {
-                padding-right: 20px;
-                .tab {
-                    padding: 0px 0px 10px 0px;
-                    flex-basis: 50%;
-                    font-size: 0.7rem;
-                }
-            }
-            .theme-header {
-                padding-right: 20px;
-                .theme-filter-wrapper {
-                    display: flex;
-                    align-items: center;
-                    flex-direction: row;
-                    margin-bottom: 20px;
-
-                    .select-theme-fix {
-                        width: 70px;
-                        height: 25px;
-                        box-sizing: border-box;
-                        justify-content: space-evenly;
-                        padding: 5px;
-                        margin-right: 10px;
-                        border: 1px solid $ww-grey-strong;
-                        border-radius: 3px;
-                        background-color: white;
-                    }
-                    .search-theme-fix {
-                        font-size: 10px;
-                        padding: 2px;
-                        flex-grow: 1;
-                        border-color: $ww-grey-light;
-                        ::placeholder {
-                            /* Chrome, Firefox, Opera, Safari 10.1+ */
-                            color: $ww-grey-super-light;
-                            opacity: 1; /* Firefox */
-                        }
-
-                        :-ms-input-placeholder {
-                            /* Internet Explorer 10-11 */
-                            color: $ww-grey-super-light;
-                        }
-
-                        ::-ms-input-placeholder {
-                            /* Microsoft Edge */
-                            color: $ww-grey-super-light;
-                        }
-                    }
-                }
-            }
-
-            .themes {
-                width: 100%;
-                flex-grow: 1;
-                overflow-y: auto;
-                border-right: 1px solid $ww-grey-super-light;
-                padding-right: 20px;
-                .theme {
-                    height: 145px;
-                    width: 100%;
-                    margin-bottom: 20px;
-                    padding: 10px 0 0 0;
-                    font-family: $ww-font;
-                    color: $ww-grey-light;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    border-radius: 3px;
-                    transition: all 0.1s ease;
-                    text-transform: capitalize;
-                    .theme-name {
-                        font-weight: bold;
-                        color: $ww-grey;
-                        margin-bottom: 5px;
-                        font-size: 12px;
-                        margin-left: 5px;
-                        line-height: 15px;
-                        text-transform: uppercase;
-                        .section-count {
-                            font-size: 0.8rem;
-                            font-weight: normal;
-                            text-transform: lowercase;
-                        }
-                    }
-
-                    .theme-preview-wrapper {
-                        width: 100%;
-                        justify-content: space-around;
-                        display: inline-flex;
-                        flex-direction: row;
-                        height: 65px;
-
-                        margin-bottom: 5px;
-                        .theme-preview {
-                            width: 110px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            border-radius: 2px;
-                            background-color: white;
-                            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.07);
-                            background-size: contain;
-                            background-position: center;
-                            background-repeat: no-repeat;
-                            border: 2px solid white;
-                        }
-                    }
-                    .theme-description {
-                        color: $ww-grey;
-                        font-size: 10px;
-                        font-weight: 500;
-                        line-height: 13px;
-                        margin-bottom: 5px;
-                        margin-left: 5px;
-                    }
-                    .themeTags {
-                        color: $ww-grey;
-                        margin-left: 5px;
-                        font-size: 9px;
-                        font-weight: 300;
-                        line-height: 11px;
-                    }
-
-                    &.active,
-                    &:hover {
-                        background-color: #eaf2f8;
-                    }
-                }
-            }
-        }
-    }
-    .sections-wrapper {
-        flex-wrap: wrap;
-
-        width: calc(100% - 330px);
-        float: left;
-        height: 100%;
-    }
-
     .popup-container-loader {
-        position: fixed;
+        position: relative;
         overflow: hidden;
-        top: 75px;
+        top: 0;
         left: 0;
         bottom: 0;
         right: 0;
@@ -774,70 +615,384 @@ export default {
             border-color: $ww-red transparent transparent transparent;
         }
     }
-}
-.mobile-store {
-    display: flex;
-    .select-wrapper {
-        width: 100%;
-        pointer-events: all;
-    }
-}
-.mobile-store {
-    width: 95%;
-    min-height: 100px;
-    // @media (min-width: 1024px) {
-    //     display: none;
-    // }
-    // display: block;
-    pointer-events: all;
-    .dropdown-mobile {
-        pointer-events: all;
-        // display: none;
-        justify-content: center;
-        width: 100%;
-        .select {
-            select {
-                display: block;
-                width: 100%;
-                border: none;
-                appearance: none;
-                outline: none;
-                // color: white;
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                background: none;
-                padding: inherit;
-                padding: 2px 50px 2px 25px;
-                cursor: pointer;
-                font-size: 15px;
-                font-weight: bold;
-                line-height: 30px;
-            }
-            i {
-                width: 25px;
-                height: 25px;
-                font-size: 25px;
-            }
-            padding: 2px 20px 2px 25px;
-            position: relative;
+
+    .ww-popup-store {
+        display: flex;
+        flex-direction: column;
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+        }
+
+        .section-background {
             pointer-events: all;
-            display: -webkit-box;
-            display: -ms-flexbox;
+            z-index: 0;
+        }
+
+        .store-wrapper {
+            height: 600px;
+            .search {
+                display: flex;
+                justify-content: center;
+                .search-bar {
+                    width: 100%;
+                }
+            }
+            // background-color: $background-grey-light;
+            @media (min-width: 1024px) {
+                display: flex;
+            }
+            display: none;
+            overflow: hidden;
+            padding-top: 20px;
+            height: 100%;
+            pointer-events: all;
+
+            .content {
+                display: flex;
+                width: 330px;
+                height: 100%;
+                float: left;
+
+                .themes-container {
+                    padding: 0 20px 0 45px;
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    .tabs {
+                        display: flex;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                        .tab {
+                            padding: 0px 20px 10px 20px;
+                            font-size: 10px;
+                            line-height: 13px;
+                            text-align: center;
+                            text-transform: uppercase;
+                            font-family: $ww-font;
+                            font-weight: bold;
+                            cursor: pointer;
+                            color: $ww-grey-light;
+                            position: relative;
+                            border-bottom: 1px solid $ww-grey-super-light;
+                            &::after {
+                                content: "";
+                                position: absolute;
+                                top: 100%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                height: 10px;
+                                width: 10px;
+                                background-color: $ww-red-strong;
+                                border-radius: 100%;
+                                opacity: 0;
+                                transition: opacity 0.3s ease;
+                            }
+                            &:hover {
+                                color: $ww-red;
+                            }
+                            &.active {
+                                color: $ww-red;
+                                &::after {
+                                    opacity: 1;
+                                }
+                            }
+                        }
+                        .tab-fix {
+                            text-transform: capitalize;
+                            font-size: 1rem;
+                            line-height: 15px;
+                        }
+                    }
+
+                    .tabs {
+                        padding-right: 20px;
+                        .tab {
+                            padding: 0px 0px 10px 0px;
+                            flex-basis: 50%;
+                            font-size: 0.7rem;
+                        }
+                    }
+                    .theme-header {
+                        padding-right: 20px;
+                        .theme-filter-wrapper {
+                            display: flex;
+                            align-items: center;
+                            flex-direction: row;
+                            margin-bottom: 20px;
+
+                            .select-theme-fix {
+                                width: 70px;
+                                height: 25px;
+                                box-sizing: border-box;
+                                justify-content: space-evenly;
+                                padding: 5px;
+                                margin-right: 10px;
+                                border: 1px solid $ww-grey-strong;
+                                border-radius: 3px;
+                                background-color: white;
+                            }
+                            .search-theme-fix {
+                                font-size: 10px;
+                                padding: 2px;
+                                flex-grow: 1;
+                                border-color: $ww-grey-light;
+                                ::placeholder {
+                                    /* Chrome, Firefox, Opera, Safari 10.1+ */
+                                    color: $ww-grey-super-light;
+                                    opacity: 1; /* Firefox */
+                                }
+
+                                :-ms-input-placeholder {
+                                    /* Internet Explorer 10-11 */
+                                    color: $ww-grey-super-light;
+                                }
+
+                                ::-ms-input-placeholder {
+                                    /* Microsoft Edge */
+                                    color: $ww-grey-super-light;
+                                }
+                            }
+                        }
+                    }
+
+                    .themes {
+                        width: 100%;
+                        flex-grow: 1;
+                        overflow-y: auto;
+                        border-right: 1px solid $ww-grey-super-light;
+                        padding-right: 20px;
+                        .theme {
+                            height: 145px;
+                            width: 100%;
+                            margin-bottom: 20px;
+                            padding: 10px 0 0 0;
+                            font-family: $ww-font;
+                            color: $ww-grey-light;
+                            font-size: 1rem;
+                            cursor: pointer;
+                            border-radius: 3px;
+                            transition: all 0.1s ease;
+                            text-transform: capitalize;
+                            .theme-name {
+                                font-weight: bold;
+                                color: $ww-grey;
+                                margin-bottom: 5px;
+                                font-size: 12px;
+                                margin-left: 5px;
+                                line-height: 15px;
+                                text-transform: uppercase;
+                                .section-count {
+                                    font-size: 0.8rem;
+                                    font-weight: normal;
+                                    text-transform: lowercase;
+                                }
+                            }
+
+                            .theme-preview-wrapper {
+                                width: 100%;
+                                justify-content: space-around;
+                                display: inline-flex;
+                                flex-direction: row;
+                                height: 65px;
+
+                                margin-bottom: 5px;
+                                .theme-preview {
+                                    width: 110px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    border-radius: 2px;
+                                    background-color: white;
+                                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.07);
+                                    background-size: contain;
+                                    background-position: center;
+                                    background-repeat: no-repeat;
+                                    border: 2px solid white;
+                                }
+                            }
+                            .theme-description {
+                                color: $ww-grey;
+                                font-size: 10px;
+                                font-weight: 500;
+                                line-height: 13px;
+                                margin-bottom: 5px;
+                                margin-left: 5px;
+                            }
+                            .themeTags {
+                                color: $ww-grey;
+                                margin-left: 5px;
+                                font-size: 9px;
+                                font-weight: 300;
+                                line-height: 11px;
+                            }
+
+                            &.active,
+                            &:hover {
+                                background-color: #eaf2f8;
+                            }
+                        }
+                    }
+                }
+            }
+            .sections-wrapper {
+                flex-wrap: wrap;
+
+                width: calc(100% - 330px);
+                float: left;
+                height: 100%;
+            }
+        }
+
+        .mobile-store {
+            width: 95%;
+            min-height: 100px;
+            @media (min-width: 1024px) {
+                display: none;
+            }
             display: flex;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: all;
+            .dropdown-mobile {
+                pointer-events: all;
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                .select {
+                    color: white;
+                    select {
+                        display: block;
+                        width: 100%;
+                        border: none;
+                        appearance: none;
+                        outline: none;
+                        // color: white;
+                        width: 100%;
+                        height: 100%;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        background: none;
+                        padding: inherit;
+                        padding: 2px 50px 2px 25px;
+                        cursor: pointer;
+                        font-size: 15px;
+                        font-weight: bold;
+                        line-height: 30px;
+                    }
+                    i {
+                        width: 25px;
+                        height: 25px;
+                        font-size: 25px;
+                    }
+                    padding: 2px 20px 2px 25px;
+                    position: relative;
+                    pointer-events: all;
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
 
-            justify-content: space-between;
+                    justify-content: space-between;
 
-            align-items: center;
-            // color: white;
-            margin: 20px 0;
-            width: 250px;
-            height: 60px;
-            border-radius: 10px;
-            cursor: pointer;
-            background: linear-gradient(90deg, #455fa2 0%, #2d84c1 100%);
+                    align-items: center;
+                    // color: white;
+                    margin: 20px 0;
+                    width: 250px;
+                    height: 60px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    background: linear-gradient(
+                        90deg,
+                        #455fa2 0%,
+                        #2d84c1 100%
+                    );
+                }
+            }
+
+            .mobile-sections-wrapper {
+                flex-grow: 1;
+                overflow-y: auto;
+                flex-wrap: wrap;
+                font-family: $ww-font;
+                display: flex;
+                box-sizing: content-box;
+                // justify-content: flex-start;
+                // align-content: flex-start;
+                .section {
+                    flex-basis: 100%;
+
+                    margin-bottom: 25px;
+                    cursor: pointer;
+                    border-radius: 2px;
+                    justify-content: center;
+                    align-items: center;
+
+                    .section-wrapper {
+                        position: relative;
+                        padding-bottom: 56.25%;
+                        border-radius: 2px;
+                        background-color: white;
+                        background-size: contain;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border: 2px solid white;
+                        width: 100%;
+                        height: 100%;
+                        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
+                        &:hover {
+                            box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.17);
+                            .section-preview {
+                                visibility: visible;
+                                opacity: 1;
+                            }
+                        }
+                    }
+                    .section-preview {
+                        display: flex;
+                        flex-direction: column;
+                        position: absolute;
+                        min-height: 50px;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        background: linear-gradient(
+                            90deg,
+                            rgba(29, 151, 127, 0.9) 0%,
+                            rgba(44, 195, 183, 0.9) 100%
+                        );
+                        opacity: 0;
+                        padding: 5px 10px 10px 10px;
+                        color: white;
+                        visibility: hidden;
+                        border-radius: 0 0 3px 3px;
+                        transition: opacity 0.2s, visibility 0.2s;
+                        .preview-name {
+                            text-transform: uppercase;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        .preview-category {
+                            text-transform: uppercase;
+                        }
+                        .preview-tag-wrapper {
+                            display: inline-flex;
+                            font-size: 0.7rem;
+                            margin-top: 5px;
+
+                            .preview-tag {
+                                margin-right: 5px;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,1 +1,98 @@
-{}
+{
+    "topWwObjs": [
+        {
+            "uniqueId": 12874117200,
+            "wwVersion": 3,
+            "content": {
+                "type": "ww-text",
+                "data": {
+                    "text": {
+                        "fr": "Nouveau texte",
+                        "en": "<p style=\"text-align: center;\"><span class=\"ww-font-size-verybig\" style=\"font-family: Montserrat, sans-serif;\">Public Store</span></p>"
+                    },
+                    "tag": "div",
+                    "align": "",
+                    "font": "",
+                    "size": "",
+                    "color": "",
+                    "classes": [],
+                    "children": [],
+                    "fontStyle": ""
+                }
+            },
+            "link": {
+                "type": "none",
+                "data": {}
+            },
+            "ratio": -1,
+            "paddings": {
+                "xs": {
+                    "top": 25,
+                    "left": 0,
+                    "right": 0,
+                    "bottom": 25
+                },
+                "md": {
+                    "top": 25,
+                    "left": 0,
+                    "right": 0,
+                    "bottom": 25
+                }
+            },
+            "hidden": false,
+            "tags": [],
+            "children": {},
+            "data": {},
+            "anim": {}
+        }
+    ],
+    "bottomWwObjs": [],
+    "background": {
+        "uniqueId": 7708288729,
+        "wwVersion": 3,
+        "content": {
+            "type": "ww-color",
+            "data": {
+                "backgroundColor": "transparent",
+                "style": {
+                    "borderRadius": 0,
+                    "borderWidth": 0,
+                    "borderColor": null,
+                    "borderStyle": null,
+                    "boxShadow": {
+                        "x": 0,
+                        "y": 0,
+                        "b": 0,
+                        "s": 0,
+                        "c": ""
+                    }
+                },
+                "wwObjects": []
+            }
+        },
+        "link": {
+            "type": "none",
+            "data": {}
+        },
+        "ratio": -1,
+        "paddings": {
+            "xs": {
+                "top": 0,
+                "left": 0,
+                "right": 0,
+                "bottom": 0
+            },
+            "md": {
+                "top": 0,
+                "left": 0,
+                "right": 0,
+                "bottom": 0
+            }
+        },
+        "hidden": false,
+        "tags": [],
+        "children": {},
+        "data": {},
+        "anim": {}
+    }
+}
