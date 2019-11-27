@@ -691,7 +691,7 @@ export default {
                 height: 100%;
                 float: left;
                 position: sticky;
-                top: 0;
+                top: 50px;
                 padding-top: 50px;
 
                 .themes-container {
