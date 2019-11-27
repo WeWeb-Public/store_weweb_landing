@@ -516,6 +516,25 @@ export default {
 .store_weweb_landing {
     margin-bottom: 20px;
 
+    .top-ww-objs {
+        position: relative;
+        padding-top: 20px;
+        margin-bottom: 20px;
+        z-index: 1;
+        .top-ww-obj {
+            position: relative;
+        }
+    }
+
+    .bottom-ww-objs {
+        position: relative;
+        padding-bottom: 20px;
+        margin-top: 20px;
+        z-index: 1;
+        .bottom-ww-obj {
+            position: relative;
+        }
+    }
     .ww-scroll-bar {
         &::-webkit-scrollbar-thumb {
             background-color: #808080;
