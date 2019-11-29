@@ -268,17 +268,6 @@ export default {
                 console.error(error)
             }
         },
-        getStoreDisplayName(store) {
-            try {
-                if (this.storeNames[store.name]) {
-                    return wwLib.wwManagerLang.getText(this.storeNames[store.name]);
-                }
-                return store.name;
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
     },
     mounted: function () {
         this.init()

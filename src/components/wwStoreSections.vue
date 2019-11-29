@@ -14,7 +14,7 @@
                 </div>
                 <div class="filter-sections">
                     <div class="categories">
-                        <div class="category" v-for="(category, index) in categories" :key="index" @click="selectCategory(category)" :class="{'active': selectedCategory == category}">{{wwManagerLang.getText(category.name) }}</div>
+                        <div class="category" v-for="(category, index) in categories" :key="index" @click="selectCategory(category)" :class="{'active': selectedCategory == category}">{{ category.name }}</div>
                     </div>
                 </div>
             </div>
@@ -47,13 +47,11 @@ export default {
         wwManagerSearchBarIcon
     },
     props: {
-        options: Object,
         sections: Array,
         categories: Array,
     },
     data() {
         return {
-            wwManagerLang: wwLib.wwManagerLang,
             search: '',
             stores: [],
 
@@ -197,39 +195,7 @@ export default {
             } catch (error) {
                 console.error(error)
             }
-        },
-        // getPreviewUrl(section) {
-        //     try {
-        //         let url = 'https://i.twic.pics/v1/resize=800/'
-        //         if (!section.previews.length) {
-        //             // url += wwLib.wwApiRequests._getCdnUrl() + 'public/images/no_preview.jpg';
-        //             url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
-        //         } else {
-        //             if (section.previews[0].includes("http"))
-        //                 url += section.previews[0];
-        //             else
-        //                 // url += wwLib.wwApiRequests._getCdnUrl() + 'developers/' + section.previews[0]
-        //                 url += "https://cdn.weweb.app/public/images/no_image_selected.png"
-
-        //         }
-        //         return url;
-        //     } catch (error) {
-        //         console.error(error)
-        //     }
-        // },
-        getStoreDisplayName(store) {
-            try {
-                if (this.storeNames[store.name]) {
-                    return wwLib.wwManagerLang.getText(this.storeNames[store.name]);
-                }
-                return store.name;
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-    },
+        },    },
     mounted: function () {
         this.init()
     },
