@@ -240,7 +240,7 @@ export default {
         flex-direction: column;
         // sticky
         position: sticky;
-        top: 0;
+        top: 50px;
         padding-top: 50px;
         background-color: white;
         margin-bottom: 300px;
